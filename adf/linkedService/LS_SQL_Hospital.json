@@ -1,0 +1,28 @@
+{
+	"name": "LS_SQL_Hospital",
+	"properties": {
+		"parameters": {
+			"db_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "medicore-sql-dev.database.windows.net",
+			"database": "@{linkedService().db_name}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "Medicoreadmin",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KeyVault_Medicore",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "sql-hospital-east-password"
+			}
+		}
+	}
+}
