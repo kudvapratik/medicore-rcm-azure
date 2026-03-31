@@ -1,0 +1,96 @@
+{
+  "hospital_east": [
+    {
+      "datasource": "hospital_east",
+      "schema": "dbo",
+      "tablename": "patients",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_east/patients"
+    },
+    {
+      "datasource": "hospital_east",
+      "schema": "dbo",
+      "tablename": "providers",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_east/providers"
+    },
+    {
+      "datasource": "hospital_east",
+      "schema": "dbo",
+      "tablename": "departments",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "full",
+      "targetfolder": "bronze/hospital_east/departments"
+    },
+    {
+      "datasource": "hospital_east",
+      "schema": "dbo",
+      "tablename": "encounter",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_east/encounter"
+    },
+    {
+      "datasource": "hospital_east",
+      "schema": "dbo",
+      "tablename": "transactions",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_east/transactions"
+    }
+  ],
+  "hospital_west": [
+    {
+      "datasource": "hospital_west",
+      "schema": "dbo",
+      "tablename": "patients",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_west/patients"
+    },
+    {
+      "datasource": "hospital_west",
+      "schema": "dbo",
+      "tablename": "providers",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_west/providers"
+    },
+    {
+      "datasource": "hospital_west",
+      "schema": "dbo",
+      "tablename": "departments",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "full",
+      "targetfolder": "bronze/hospital_west/departments"
+    },
+    {
+      "datasource": "hospital_west",
+      "schema": "dbo",
+      "tablename": "encounter",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_west/encounter"
+    },
+    {
+      "datasource": "hospital_west",
+      "schema": "dbo",
+      "tablename": "transactions",
+      "watermark": "1900-01-01",
+      "watermarkcolumn": "modified_date",
+      "loadtype": "incremental",
+      "targetfolder": "bronze/hospital_west/transactions"
+    }
+  ]
+}
