@@ -1,5 +1,5 @@
 {
-	"name": "DS_DeltaLake",
+	"name": "DS_DeltaLake_Audit",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_Databricks_Medicore",
