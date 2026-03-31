@@ -1,5 +1,5 @@
 {
-	"name": "DS_SQL_EMR_Source",
+	"name": "DS_Azure_SQL",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_SQL_Hospital",
