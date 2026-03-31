@@ -22,7 +22,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Get Metadata1",
+							"name": "File_Exists",
 							"type": "GetMetadata",
 							"dependsOn": [],
 							"policy": {
