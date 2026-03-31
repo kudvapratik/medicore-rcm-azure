@@ -3,69 +3,98 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy_EMR_to_Bronze",
-				"type": "Copy",
+				"name": "ForEach_Tables",
+				"type": "ForEach",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+					"items": {
+						"value": "@json('[\n  {\"schemaName\":\"dbo\",\"tableName\":\"patients\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"providers\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"departments\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"encounters\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"transactions\",\"db_name\":\"medicore-hospital-east\"}\n]')",
+						"type": "Expression"
 					},
-					"sink": {
-						"type": "ParquetSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "ParquetWriteSettings"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_SQL_EMR_Source",
-						"type": "DatasetReference",
-						"parameters": {
-							"schemaName": {
-								"value": "dbo",
-								"type": "Expression"
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy_Table_to_Bronze",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
 							},
-							"tableName": {
-								"value": "patients",
-								"type": "Expression"
-							}
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SQL_EMR_Source",
+									"type": "DatasetReference",
+									"parameters": {
+										"schemaName": {
+											"value": "@item().schemaName",
+											"type": "Expression"
+										},
+										"tableName": {
+											"value": "@item().tableName",
+											"type": "Expression"
+										},
+										"dbname": {
+											"value": "@item().db_name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_Parquet_Bronze",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": "@concat('bronze/', pipeline().parameters.bronzeFolder, '/', item().tableName)"
+									}
+								}
+							]
 						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DS_Parquet_Bronze",
-						"type": "DatasetReference",
-						"parameters": {
-							"folderPath": "bronze/hospital_east/patients"
-						}
-					}
-				]
+					]
+				}
 			}
 		],
+		"parameters": {
+			"hospitalName": {
+				"type": "string",
+				"defaultValue": "medicore-hospital-east"
+			},
+			"bronzeFolder": {
+				"type": "string",
+				"defaultValue": "hospital_east"
+			}
+		},
 		"annotations": []
 	}
 }

@@ -1,0 +1,49 @@
+{
+	"name": "DS_LoadConfig",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_Medicore",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "load_config.csv",
+				"folderPath": "configs/emr",
+				"fileSystem": "medicore-rcm"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "datasource",
+				"type": "String"
+			},
+			{
+				"name": "tablename",
+				"type": "String"
+			},
+			{
+				"name": "watermark",
+				"type": "String"
+			},
+			{
+				"name": "loadtype",
+				"type": "String"
+			},
+			{
+				"name": "watermarkcolumn",
+				"type": "String"
+			},
+			{
+				"name": "schema",
+				"type": "String"
+			}
+		]
+	}
+}

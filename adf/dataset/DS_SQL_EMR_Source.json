@@ -5,7 +5,10 @@
 			"referenceName": "LS_SQL_Hospital",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"db_name": "medicore-hospital-east"
+				"db_name": {
+					"value": "@dataset().dbname",
+					"type": "Expression"
+				}
 			}
 		},
 		"parameters": {
@@ -16,14 +19,24 @@
 			"tableName": {
 				"type": "string",
 				"defaultValue": "@dataset().tableName"
+			},
+			"dbname": {
+				"type": "string",
+				"defaultValue": "@dataset().dbname"
 			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "dbo",
-			"table": "patients"
+			"schema": {
+				"value": "@dataset().schemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
