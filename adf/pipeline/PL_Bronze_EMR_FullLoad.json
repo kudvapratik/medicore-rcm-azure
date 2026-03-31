@@ -5,14 +5,212 @@
 			{
 				"name": "ForEach_Tables",
 				"type": "ForEach",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Lookup_LoadConfig",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@json('[\n  {\"schemaName\":\"dbo\",\"tableName\":\"patients\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"providers\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"departments\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"encounters\",\"db_name\":\"medicore-hospital-east\"},\n  {\"schemaName\":\"dbo\",\"tableName\":\"transactions\",\"db_name\":\"medicore-hospital-east\"}\n]')",
+						"value": "@activity('Lookup_LoadConfig').output.value",
 						"type": "Expression"
 					},
-					"isSequential": true
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "If_FullOrIncremental",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().loadtype, 'full')",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Fetch_Logs",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": true,
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"dataset": {
+												"referenceName": "DS_LoadConfig",
+												"type": "DatasetReference"
+											}
+										}
+									},
+									{
+										"name": "Incremental_Load_CP",
+										"type": "Copy",
+										"dependsOn": [
+											{
+												"activity": "Fetch_Logs",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": "@concat('SELECT MAX(loaddate) as watermark FROM medicore_dbx_dev.audit.load_logs WHERE tablename = ''', item().tablename, ''' AND data_source = ''', item().datasource, '''')",
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"sink": {
+												"type": "ParquetSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "ParquetWriteSettings"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_SQL_EMR_Source",
+												"type": "DatasetReference",
+												"parameters": {
+													"schemaName": {
+														"value": "@item().schema",
+														"type": "Expression"
+													},
+													"tableName": {
+														"value": "@item().tablename",
+														"type": "Expression"
+													},
+													"dbname": {
+														"value": "@item().datasource",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_Parquet_Bronze",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": "@concat('bronze/', item().datasource, '/', item().tablename)"
+												}
+											}
+										]
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Full_Load_CP",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": "@concat('SELECT * FROM ', item().schema, '.', item().tablename)",
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"sink": {
+												"type": "ParquetSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "ParquetWriteSettings"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_SQL_EMR_Source",
+												"type": "DatasetReference",
+												"parameters": {
+													"schemaName": {
+														"value": "@item().schema",
+														"type": "Expression"
+													},
+													"tableName": {
+														"value": "@item().tablename",
+														"type": "Expression"
+													},
+													"dbname": {
+														"value": "@item().datasource",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_Parquet_Bronze",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": "@concat('bronze/', item().datasource, '/', item().tablename)"
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
 				}
 			},
 			{
