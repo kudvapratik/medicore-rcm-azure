@@ -1,0 +1,22 @@
+{
+	"name": "DS_SQL_EMR_Source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_Hospital",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"schemaName": {
+				"type": "string",
+				"defaultValue": "@dataset().schemaName"
+			},
+			"tableName": {
+				"type": "string",
+				"defaultValue": "@dataset().tableName"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
