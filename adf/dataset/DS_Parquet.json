@@ -1,5 +1,5 @@
 {
-	"name": "DS_Parquet_Bronze",
+	"name": "DS_Parquet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_ADLS_Medicore",
