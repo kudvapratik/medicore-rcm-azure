@@ -22,198 +22,34 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If_FullOrIncremental",
-							"type": "IfCondition",
+							"name": "Get Metadata1",
+							"type": "GetMetadata",
 							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"expression": {
-									"value": "@equals(item().loadtype, 'full')",
-									"type": "Expression"
+								"dataset": {
+									"referenceName": "DS_Parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": "bronze",
+										"file_path": "bro"
+									}
 								},
-								"ifFalseActivities": [
-									{
-										"name": "Fetch_Logs",
-										"type": "Lookup",
-										"dependsOn": [],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "DelimitedTextSource",
-												"storeSettings": {
-													"type": "AzureBlobFSReadSettings",
-													"recursive": true,
-													"enablePartitionDiscovery": false
-												},
-												"formatSettings": {
-													"type": "DelimitedTextReadSettings"
-												}
-											},
-											"dataset": {
-												"referenceName": "DS_LoadConfig",
-												"type": "DatasetReference"
-											}
-										}
-									},
-									{
-										"name": "Incremental_Load_CP",
-										"type": "Copy",
-										"dependsOn": [
-											{
-												"activity": "Fetch_Logs",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "AzureSqlSource",
-												"sqlReaderQuery": {
-													"value": "@concat('SELECT MAX(loaddate) as watermark FROM medicore_dbx_dev.audit.load_logs WHERE tablename = ''', item().tablename, ''' AND data_source = ''', item().datasource, '''')",
-													"type": "Expression"
-												},
-												"queryTimeout": "02:00:00",
-												"partitionOption": "None"
-											},
-											"sink": {
-												"type": "ParquetSink",
-												"storeSettings": {
-													"type": "AzureBlobFSWriteSettings"
-												},
-												"formatSettings": {
-													"type": "ParquetWriteSettings"
-												}
-											},
-											"enableStaging": false,
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
-											}
-										},
-										"inputs": [
-											{
-												"referenceName": "DS_SQL_EMR_Source",
-												"type": "DatasetReference",
-												"parameters": {
-													"schemaName": {
-														"value": "@item().schema",
-														"type": "Expression"
-													},
-													"tableName": {
-														"value": "@item().tablename",
-														"type": "Expression"
-													},
-													"dbname": {
-														"value": "@item().datasource",
-														"type": "Expression"
-													}
-												}
-											}
-										],
-										"outputs": [
-											{
-												"referenceName": "DS_Parquet_Bronze",
-												"type": "DatasetReference",
-												"parameters": {
-													"container": "@concat('bronze/', item().datasource, '/', item().tablename)"
-												}
-											}
-										]
-									}
-								],
-								"ifTrueActivities": [
-									{
-										"name": "Full_Load_CP",
-										"type": "Copy",
-										"dependsOn": [],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "AzureSqlSource",
-												"sqlReaderQuery": {
-													"value": "@concat('SELECT * FROM ', item().schema, '.', item().tablename)",
-													"type": "Expression"
-												},
-												"queryTimeout": "02:00:00",
-												"partitionOption": "None"
-											},
-											"sink": {
-												"type": "ParquetSink",
-												"storeSettings": {
-													"type": "AzureBlobFSWriteSettings"
-												},
-												"formatSettings": {
-													"type": "ParquetWriteSettings"
-												}
-											},
-											"enableStaging": false,
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
-											}
-										},
-										"inputs": [
-											{
-												"referenceName": "DS_SQL_EMR_Source",
-												"type": "DatasetReference",
-												"parameters": {
-													"schemaName": {
-														"value": "@item().schema",
-														"type": "Expression"
-													},
-													"tableName": {
-														"value": "@item().tablename",
-														"type": "Expression"
-													},
-													"dbname": {
-														"value": "@item().datasource",
-														"type": "Expression"
-													}
-												}
-											}
-										],
-										"outputs": [
-											{
-												"referenceName": "DS_Parquet_Bronze",
-												"type": "DatasetReference",
-												"parameters": {
-													"container": "@concat('bronze/', item().datasource, '/', item().tablename)"
-												}
-											}
-										]
-									}
-								]
+								"fieldList": [],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
 							}
 						}
 					]
@@ -244,7 +80,7 @@
 						}
 					},
 					"dataset": {
-						"referenceName": "DS_LoadConfig",
+						"referenceName": "DS_FlatFile",
 						"type": "DatasetReference",
 						"parameters": {
 							"container": "configs",
