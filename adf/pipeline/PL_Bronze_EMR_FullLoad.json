@@ -39,7 +39,14 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"container": "bronze",
-										"file_path": "bro"
+										"file_path": {
+											"value": "@item().targetpath",
+											"type": "Expression"
+										},
+										"file_name": {
+											"value": "@split(item().tablename,'.')[1]",
+											"type": "Expression"
+										}
 									}
 								},
 								"fieldList": [],
