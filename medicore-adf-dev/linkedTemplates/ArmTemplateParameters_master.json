@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "medicore-adf-dev"
+		},
+		"LS_Databricks_Medicore_accessToken": {
+			"value": ""
+		},
+		"LS_ADLS_Medicore_properties_typeProperties_url": {
+			"value": "https://medicoreadlsdev.dfs.core.windows.net/"
+		},
+		"LS_KeyVault_Medicore_properties_typeProperties_baseUrl": {
+			"value": "https://medicore-kv-dev.vault.azure.net/"
+		},
+		"LS_SQL_Hospital_properties_typeProperties_server": {
+			"value": "medicore-sql-dev.database.windows.net"
+		},
+		"LS_SQL_Hospital_properties_typeProperties_database": {
+			"value": "@{linkedService().db_name}"
+		},
+		"LS_SQL_Hospital_properties_typeProperties_userName": {
+			"value": "Medicoreadmin"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
