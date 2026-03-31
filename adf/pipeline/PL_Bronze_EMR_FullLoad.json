@@ -1,0 +1,71 @@
+{
+	"name": "PL_Bronze_EMR_FullLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_EMR_to_Bronze",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_EMR_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaName": {
+								"value": "dbo",
+								"type": "Expression"
+							},
+							"tableName": {
+								"value": "patients",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Parquet_Bronze",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": "bronze/hospital_east/patients"
+						}
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
